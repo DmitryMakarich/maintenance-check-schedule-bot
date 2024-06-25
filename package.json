@@ -1,0 +1,23 @@
+{
+  "name": "maintenance-check-schedule-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node ./bot.ts",
+    "dev": "ts-node-dev ./bot.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cron": "^3.1.7",
+    "dotenv": "^16.4.5",
+    "grammy": "^1.11.2"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.7.4"
+  }
+}
