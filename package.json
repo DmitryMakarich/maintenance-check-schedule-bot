@@ -4,9 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "rm -rf dist/ && tsc",
     "start": "ts-node ./src/bot.ts",
     "dev": "ts-node-dev ./src/bot.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build-image": "sudo docker build -f ./Dockerfile  --memory 2048m -t maintenance-bot-v1-local-image .",
+    "container": "sudo docker run -d --restart unless-stopped --name maintenance-bot-v1-local --network=\"host\" --env-file .env --log-driver json-file --log-opt max-size=10m maintenance-bot-v1-local-image dist/src/bot.js",
+    "stop-container": "sudo docker stop maintenance-bot-v1-local",
+    "remove-container": "sudo docker rm maintenance-bot-v1-local"
   },
   "author": "",
   "license": "ISC",
