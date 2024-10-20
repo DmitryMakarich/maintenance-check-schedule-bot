@@ -3,7 +3,7 @@ import { CronJob } from 'cron';
 import 'dotenv/config';
 import { DAY_OF_WEEK, getWeeksBetween } from './weeks.helper';
 
-const { TG_KEY, SCHEDULE, CHAT_ID, BOT_NAME, KSENIA_USERNAME, DIMA_USERNAME, IGOR_USERNAME, STAS_USERNAME } = process.env;
+const { TG_KEY, SCHEDULE, CHAT_ID, BOT_NAME, KSENIA_USERNAME, DIMA_USERNAME, IGOR_USERNAME, STAS_USERNAME, TEST_DATE } = process.env;
 
 class MaintenanceCheckNotificationCronJob {
   // Anchor data for sprint calculations
@@ -56,7 +56,7 @@ class MaintenanceCheckNotificationCronJob {
   }
 
   private async notifyIfScheduled() {
-    const currentDate = new Date();
+    const currentDate = TEST_DATE ? new Date(TEST_DATE) : new Date();
     // const currentDate = new Date('2024-08-15');
     const result = this.getMaintenanceDayAndCheckerUsername(currentDate);
     if (!result) return;

@@ -1,0 +1,82 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-image-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+      - name: Extract commit sha
+        shell: bash
+        run: echo "sha=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+        id: extract_sha
+      - name: Docker login
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build image
+        run: docker build -f docker/Dockerfile --memory 512m -t $IMAGE_NAME .
+        env:
+          IMAGE_NAME: crowdship/internal:bot-v1-${{ steps.extract_branch.outputs.branch }}-${{ steps.extract_sha.outputs.sha }}
+      - name: Push to DockerHub
+        run: docker push $IMAGE_NAME
+        env:
+          IMAGE_NAME: crowdship/internal:bot-v1-${{ steps.extract_branch.outputs.branch }}-${{ steps.extract_sha.outputs.sha }}
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    runs-on: [self-hosted, aws]
+    needs: build-image-and-push
+    steps:
+      - name: Extract commit sha
+        shell: bash
+        run: echo "sha=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+        id: extract_sha
+      - name: Stop all running containers
+        run: sudo docker stop $(sudo docker ps -a -q)
+        continue-on-error: true
+      - name: Remove docker containers
+        run: sudo docker rm $(sudo docker ps -a -q)
+        continue-on-error: true
+      - name: Remove unused images
+        run: sudo docker system prune --all --force
+        continue-on-error: true
+      - name: Remove unused volumes
+        run: sudo docker volume prune --force
+      - name: Pull docker image
+        run: sudo docker pull $IMAGE_NAME
+        env:
+          IMAGE_NAME: crowdship/internal:bot-v1-master-${{ steps.extract_sha.outputs.sha }}
+      - name: Run docker containers
+        run: sudo docker run -d --restart unless-stopped \ 
+          --name maintenance-bot-v1-master \ 
+          --network="host" -e TG_KEY=$TG_KEY \
+          -e BOT_NAME=$BOT_NAME \
+          -e SCHEDULE=$SCHEDULE \
+          -e CHAT_ID=$CHAT_ID \
+          -e KSENIA_USERNAME=$KSENIA_USERNAME \
+          -e DIMA_USERNAME=$DIMA_USERNAME \
+          -e IGOR_USERNAME=$IGOR_USERNAME \
+          -e STAS_USERNAME=$STAS_USERNAME \
+          -e TEST_DATE=$TEST_DATE \
+          --log-opt max-size=10m \ 
+          $IMAGE_NAME dist/src/bot.js 
+        env:
+          IMAGE_NAME: crowdship/internal:bot-v1-master-${{ steps.extract_sha.outputs.sha }}
+          TG_KEY: ${{ secrets.TG_KEY }}
+          BOT_NAME: ${{ secrets.BOT_NAME }}
+          SCHEDULE: ${{ secrets.SCHEDULE }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          KSENIA_USERNAME: ${{ secrets.KSENIA_USERNAME }}
+          DIMA_USERNAME: ${{ secrets.DIMA_USERNAME }}
+          IGOR_USERNAME: ${{ secrets.IGOR_USERNAME }}
+          STAS_USERNAME: ${{ secrets.STAS_USERNAME }}
+          TEST_DATE: ${{ secrets.TEST_DATE }}
+      - name: Remove unused docker images
+        run: sudo docker image prune -af
+  
