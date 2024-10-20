@@ -55,7 +55,7 @@ jobs:
       - name: Run docker containers
         run: sudo docker run -d --restart unless-stopped \ 
           --name maintenance-bot-v1-master \ 
-          --network="host" -e TG_KEY=$TG_KEY \
+          --network="host" -e TG_KEY="$TG_KEY" \
           -e BOT_NAME=$BOT_NAME \
           -e SCHEDULE="$SCHEDULE" \
           -e CHAT_ID=$CHAT_ID \
