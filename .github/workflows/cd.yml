@@ -57,13 +57,13 @@ jobs:
           --name maintenance-bot-v1-master \ 
           --network="host" -e TG_KEY=$TG_KEY \
           -e BOT_NAME=$BOT_NAME \
-          -e SCHEDULE=$SCHEDULE \
+          -e SCHEDULE="$SCHEDULE" \
           -e CHAT_ID=$CHAT_ID \
           -e KSENIA_USERNAME=$KSENIA_USERNAME \
           -e DIMA_USERNAME=$DIMA_USERNAME \
           -e IGOR_USERNAME=$IGOR_USERNAME \
           -e STAS_USERNAME=$STAS_USERNAME \
-          -e TEST_DATE=$TEST_DATE \
+          -e TEST_DATE="$TEST_DATE" \
           --log-opt max-size=10m \ 
           $IMAGE_NAME dist/src/bot.js 
         env:
