@@ -21,7 +21,7 @@ jobs:
       - name: Docker login
         run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
       - name: Build image
-        run: docker build -f docker/Dockerfile --memory 512m -t $IMAGE_NAME .
+        run: docker build -f Dockerfile --memory 512m -t $IMAGE_NAME .
         env:
           IMAGE_NAME: crowdship/internal:bot-v1-${{ steps.extract_branch.outputs.branch }}-${{ steps.extract_sha.outputs.sha }}
       - name: Push to DockerHub
