@@ -85,17 +85,15 @@ class MaintenanceCheckNotificationCronJob {
 
   /*
    *  A sprint starts on Thursday, The first (1) check is on the next day, on Friday.
-   *  The second (2) check is on Monday on the next week.
-   *  The third (3) check is on Thursday on the same week.
-   *  The last (4) check is on Monday on the next week.
+   *  The second (2) check is on Wednesday on the next week.
+   *  The third (3) check is on Monday on the next week.
    *  Method returns -1 if no check is scheduled
    *
    *  Example:
-   *  Sprint 69 started on July 11th.
-   *  1st check: July 12th, Friday
-   *  2nd check: July 15th, Monday
-   *  3rd check: July 18th, Thursday
-   *  4th check: July 22th, Monday
+   *  Sprint 88 started on April 2nd.
+   *  1st check: April 4th, Friday
+   *  2nd check: April 9th, Wednesday
+   *  3rd check: April 14th, Monday
    */
   private whatMaintenanceCheckIsScheduled(
     date: Date,
