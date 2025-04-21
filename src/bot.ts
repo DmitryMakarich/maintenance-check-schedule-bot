@@ -50,9 +50,6 @@ class MaintenanceCheckNotificationCronJob {
 
     this.bot.start();
 
-
-    this.bot.api.sendMessage(CHAT_ID as string, 'Hi');
-
     this.bot.on('message:text', ctx => {
       console.info(ctx.chat.id);
       if (ctx.message.text.includes(BOT_NAME as string)) 
