@@ -30,7 +30,7 @@ jobs:
           IMAGE_NAME: crowdship/internal:bot-v1-${{ steps.extract_branch.outputs.branch }}-${{ steps.extract_sha.outputs.sha }}
   deploy:
     if: github.ref == 'refs/heads/master'
-    runs-on: [self-hosted, aws]
+    runs-on: [self-hosted]
     needs: build-image-and-push
     steps:
       - name: Extract commit sha
@@ -60,7 +60,6 @@ jobs:
           BOT_NAME: ${{ secrets.BOT_NAME }}
           SCHEDULE: ${{ secrets.SCHEDULE }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-          KSENIA_USERNAME: ${{ secrets.KSENIA_USERNAME }}
           DIMA_USERNAME: ${{ secrets.DIMA_USERNAME }}
           IGOR_USERNAME: ${{ secrets.IGOR_USERNAME }}
           STAS_USERNAME: ${{ secrets.STAS_USERNAME }}
