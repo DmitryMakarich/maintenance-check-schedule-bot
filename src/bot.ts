@@ -18,7 +18,7 @@ class MaintenanceCheckNotificationCronJob {
   // Anchor data for sprint calculations
   private anchorDate = new Date("2024-07-11");
   private anchorSprint = 69;
-  private runOnStart = true;
+  private runOnStart = false;
   private bot = new Bot(TG_KEY as string);
   // %2 + 1
   private firstSprintSchedule: SprintSchedule = {
