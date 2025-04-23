@@ -1,7 +1,7 @@
 import { Bot } from "grammy";
-import { CronJob } from 'cron';
-import 'dotenv/config';
-import { DAY_OF_WEEK, getWeeksBetween } from './weeks.helper';
+import { CronJob } from "cron";
+import "dotenv/config";
+import { DAY_OF_WEEK, getWeeksBetween } from "./weeks.helper";
 
 const {
   TG_KEY,
@@ -16,20 +16,20 @@ const {
 
 class MaintenanceCheckNotificationCronJob {
   // Anchor data for sprint calculations
-  private anchorDate = new Date('2024-07-11');
+  private anchorDate = new Date("2024-07-11");
   private anchorSprint = 69;
-  private runOnStart = false;
+  private runOnStart = true;
   private bot = new Bot(TG_KEY as string);
   // %2 + 1
   private firstSprintSchedule: SprintSchedule = {
-    1: IGOR_USERNAME as string,
-    2: STAS_USERNAME as string,
-    3: DIMA_USERNAME as string,
+    1: DIMA_USERNAME as string,
+    2: IGOR_USERNAME as string,
+    3: STAS_USERNAME as string,
   };
   // %2
   private secondSprintSchedule: SprintSchedule = {
-    1: STAS_USERNAME as string,
-    2: IGOR_USERNAME as string,
+    1: IGOR_USERNAME as string,
+    2: STAS_USERNAME as string,
     3: DIMA_USERNAME as string,
   };
   private thirdSprintSchedule: SprintSchedule = {
@@ -43,16 +43,16 @@ class MaintenanceCheckNotificationCronJob {
       () => this.notifyIfScheduled(),
       null,
       undefined,
-      'UTC',
+      "UTC",
       undefined,
-      this.runOnStart,
+      this.runOnStart
     );
 
     this.bot.start();
 
     this.bot.on('message:text', ctx => {
       console.info(ctx.chat.id);
-      if (ctx.message.text.includes(BOT_NAME as string)) 
+      if (ctx.message.text.includes(BOT_NAME as string))
         ctx.react("❤");
       // ctx.reply('test');
     })
@@ -61,7 +61,8 @@ class MaintenanceCheckNotificationCronJob {
     console.info(`Cron job status: ${job.running}`);
 
     if (!job.running) {
-      const msg = 'the process is stopped, please check cron jobs and restart the server';
+      const msg =
+        "the process is stopped, please check cron jobs and restart the server";
       console.error(msg);
       process.exit(1);
     }
@@ -79,7 +80,7 @@ class MaintenanceCheckNotificationCronJob {
   }
 
   private async sendNotification(message: string) {
-    console.info('Sending notification...');
+    console.info("Sending notification...");
     await this.bot.api.sendMessage(CHAT_ID as string, message);
   }
 
@@ -118,7 +119,9 @@ class MaintenanceCheckNotificationCronJob {
     const currentSprint = this.anchorSprint + Math.floor(weekDifference / 2);
 
     const check = this.whatMaintenanceCheckIsScheduled(date, weekDifference);
-    console.info(`date: ${date.toISOString()}, anchor: ${this.anchorDate.toISOString()}`);
+    console.info(
+      `date: ${date.toISOString()}, anchor: ${this.anchorDate.toISOString()}`
+    );
     console.info(`weekDifference: ${weekDifference}`);
     console.info(`Current sprint: ${currentSprint}, check day: ${check}`);
     if (check === -1) return;
@@ -134,7 +137,7 @@ class MaintenanceCheckNotificationCronJob {
   }
 
   private getMessage(username: string, check: MaintenanceCheckDay): string {
-    const basicCheck = 'resources, queues';
+    const basicCheck = "resources, queues";
     const fullCheck = `${basicCheck} and logs`;
 
     const areasToCheck = check === 2 ? fullCheck : basicCheck;
