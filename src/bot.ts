@@ -11,6 +11,7 @@ const {
   DIMA_USERNAME,
   IGOR_USERNAME,
   STAS_USERNAME,
+  DANIIL_USERNAME,
   TEST_DATE,
 } = process.env;
 
@@ -20,22 +21,30 @@ class MaintenanceCheckNotificationCronJob {
   private anchorSprint = 69;
   private runOnStart = false;
   private bot = new Bot(TG_KEY as string);
-  // %2 + 1
+  // Sprint rotation: 4 developers, 4 checks per sprint
   private firstSprintSchedule: SprintSchedule = {
     1: DIMA_USERNAME as string,
     2: IGOR_USERNAME as string,
     3: STAS_USERNAME as string,
+    4: DANIIL_USERNAME as string,
   };
-  // %2
   private secondSprintSchedule: SprintSchedule = {
     1: IGOR_USERNAME as string,
     2: STAS_USERNAME as string,
-    3: DIMA_USERNAME as string,
+    3: DANIIL_USERNAME as string,
+    4: DIMA_USERNAME as string,
   };
   private thirdSprintSchedule: SprintSchedule = {
-    1: IGOR_USERNAME as string,
+    1: STAS_USERNAME as string,
+    2: DANIIL_USERNAME as string,
+    3: DIMA_USERNAME as string,
+    4: IGOR_USERNAME as string,
+  };
+  private fourthSprintSchedule: SprintSchedule = {
+    1: DANIIL_USERNAME as string,
     2: DIMA_USERNAME as string,
-    3: STAS_USERNAME as string,
+    3: IGOR_USERNAME as string,
+    4: STAS_USERNAME as string,
   };
   constructor() {
     const job = new CronJob(
@@ -94,30 +103,46 @@ class MaintenanceCheckNotificationCronJob {
   }
 
   /*
-   *  A sprint starts on Thursday, The first (1) check is on the next day, on Friday.
-   *  The second (2) check is on Wednesday on the next week.
-   *  The third (3) check is on Monday on the next week.
+   *  A sprint is 3 weeks long and starts on Thursday.
+   *  The first (1) check is on the next day, on Friday (week 1).
+   *  The second (2) check is on Tuesday on the next week (week 2).
+   *  The third (3) check is on Thursday on the next week (week 2).
+   *  The fourth (4) check is on Monday on the next week (week 3).
    *  Method returns -1 if no check is scheduled
    *
    *  Example:
-   *  Sprint 88 started on April 2nd.
-   *  1st check: April 4th, Friday
-   *  2nd check: April 9th, Wednesday
-   *  3rd check: April 14th, Monday
+   *  Sprint starts on Thursday, April 2nd.
+   *  1st check: April 4th, Friday (week 1)
+   *  2nd check: April 8th, Tuesday (week 2)
+   *  3rd check: April 10th, Thursday (week 2)
+   *  4th check: April 14th, Monday (week 3)
    */
   private whatMaintenanceCheckIsScheduled(
     date: Date,
     weekDifference: number
   ): -1 | MaintenanceCheckDay {
-    const isFirstWeekOfSprint = !(weekDifference % 2);
+    const weekInSprint = weekDifference % 3;
     const dayOfWeek = date.getDay();
 
-    if (isFirstWeekOfSprint) {
+    // Week 1 of sprint
+    if (weekInSprint === 0) {
       if (dayOfWeek === DAY_OF_WEEK.FRIDAY) return 1;
-      if (dayOfWeek === DAY_OF_WEEK.WEDNESDAY) return 2;
       return -1;
     }
-    if (dayOfWeek === DAY_OF_WEEK.MONDAY) return 3;
+    
+    // Week 2 of sprint
+    if (weekInSprint === 1) {
+      if (dayOfWeek === DAY_OF_WEEK.TUESDAY) return 2;
+      if (dayOfWeek === DAY_OF_WEEK.THURSDAY) return 3;
+      return -1;
+    }
+    
+    // Week 3 of sprint
+    if (weekInSprint === 2) {
+      if (dayOfWeek === DAY_OF_WEEK.MONDAY) return 4;
+      return -1;
+    }
+    
     return -1;
   }
 
@@ -125,7 +150,7 @@ class MaintenanceCheckNotificationCronJob {
     date: Date
   ): { check: MaintenanceCheckDay; checker: string } | undefined {
     const weekDifference = getWeeksBetween(this.anchorDate, date);
-    const currentSprint = this.anchorSprint + Math.floor(weekDifference / 2);
+    const currentSprint = this.anchorSprint + Math.floor(weekDifference / 3);
 
     const check = this.whatMaintenanceCheckIsScheduled(date, weekDifference);
     console.info(
@@ -135,13 +160,15 @@ class MaintenanceCheckNotificationCronJob {
     console.info(`Current sprint: ${currentSprint}, check day: ${check}`);
     if (check === -1) return;
 
-    switch (currentSprint % 3) {
+    switch (currentSprint % 4) {
       case 0:
-        return { check, checker: this.thirdSprintSchedule[check] };
+        return { check, checker: this.fourthSprintSchedule[check] };
       case 1:
         return { check, checker: this.firstSprintSchedule[check] };
       case 2:
         return { check, checker: this.secondSprintSchedule[check] };
+      case 3:
+        return { check, checker: this.thirdSprintSchedule[check] };
     }
   }
 
@@ -157,5 +184,5 @@ class MaintenanceCheckNotificationCronJob {
 
 new MaintenanceCheckNotificationCronJob();
 
-type MaintenanceCheckDay = 1 | 2 | 3;
+type MaintenanceCheckDay = 1 | 2 | 3 | 4;
 type SprintSchedule = Record<MaintenanceCheckDay, string>;
