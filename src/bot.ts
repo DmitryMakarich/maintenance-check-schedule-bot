@@ -54,6 +54,10 @@ class MaintenanceCheckNotificationCronJob {
 
     this.bot.on('message:text', ctx => {
       console.info(ctx.chat.id);
+      console.info(ctx.message.text); 
+      console.info(BOT_NAME as string);
+      console.info(CHAT_ID as string);
+
       if (ctx.message.text.includes(BOT_NAME as string)) {
         console.info('included')
         ctx.react("❤");
