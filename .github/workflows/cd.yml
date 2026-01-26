@@ -37,23 +37,23 @@ jobs:
         shell: bash
         run: echo "sha=${GITHUB_SHA}" >> $GITHUB_OUTPUT
         id: extract_sha
-      - name: Stop all running containers
-        run: echo $SYSTEM_PASS | sudo -S docker stop $(echo $SYSTEM_PASS | sudo -S docker ps -a -q)
+      - name: Stop maintenance bot container
+        run: echo $SYSTEM_PASS | sudo -S docker stop maintenance-bot-v1-master
         continue-on-error: true
         env:
           SYSTEM_PASS: ${{ secrets.SYSTEM_PASS }}
-      - name: Remove docker containers
-        run: echo $SYSTEM_PASS | sudo -S docker rm $(echo $SYSTEM_PASS | sudo -S docker ps -a -q)
+      - name: Remove maintenance bot container
+        run: echo $SYSTEM_PASS | sudo -S docker rm maintenance-bot-v1-master
         continue-on-error: true
         env:
           SYSTEM_PASS: ${{ secrets.SYSTEM_PASS }}
-      - name: Remove unused images
-        run: echo $SYSTEM_PASS | sudo -S docker system prune --all --force
+      - name: Remove old bot images
+        run: |
+          OLD_IMAGES=$(echo $SYSTEM_PASS | sudo -S docker images "crowdship/internal" --format "{{.ID}} {{.Repository}}:{{.Tag}}" | grep "bot-v1-master" | grep -v "${{ steps.extract_sha.outputs.sha }}" | awk '{print $1}')
+          if [ ! -z "$OLD_IMAGES" ]; then
+            echo $SYSTEM_PASS | sudo -S docker rmi -f $OLD_IMAGES
+          fi
         continue-on-error: true
-        env:
-          SYSTEM_PASS: ${{ secrets.SYSTEM_PASS }}
-      - name: Remove unused volumes
-        run: echo $SYSTEM_PASS | sudo -S docker volume prune --force
         env:
           SYSTEM_PASS: ${{ secrets.SYSTEM_PASS }}
       - name: Pull docker image
@@ -72,9 +72,5 @@ jobs:
           DIMA_USERNAME: ${{ secrets.DIMA_USERNAME }}
           IGOR_USERNAME: ${{ secrets.IGOR_USERNAME }}
           STAS_USERNAME: ${{ secrets.STAS_USERNAME }}
-          SYSTEM_PASS: ${{ secrets.SYSTEM_PASS }}
-      - name: Remove unused docker images
-        run: echo $SYSTEM_PASS | sudo -S docker image prune -af
-        env:
           SYSTEM_PASS: ${{ secrets.SYSTEM_PASS }}
   
