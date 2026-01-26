@@ -48,6 +48,8 @@ class MaintenanceCheckNotificationCronJob {
       this.runOnStart
     );
 
+    console.info('test')
+
     this.bot.start();
 
     this.bot.on('message:text', ctx => {
