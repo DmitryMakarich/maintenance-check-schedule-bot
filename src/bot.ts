@@ -10,7 +10,7 @@ const {
   BOT_NAME,
   DIMA_USERNAME,
   IGOR_USERNAME,
-  STAS_USERNAME,
+  GRISHA_USERNAME,
   DANIIL_USERNAME,
   TEST_DATE,
 } = process.env;
@@ -25,17 +25,17 @@ class MaintenanceCheckNotificationCronJob {
   private firstSprintSchedule: SprintSchedule = {
     1: DIMA_USERNAME as string,
     2: IGOR_USERNAME as string,
-    3: STAS_USERNAME as string,
+    3: GRISHA_USERNAME as string,
     4: DANIIL_USERNAME as string,
   };
   private secondSprintSchedule: SprintSchedule = {
     1: IGOR_USERNAME as string,
-    2: STAS_USERNAME as string,
+    2: GRISHA_USERNAME as string,
     3: DANIIL_USERNAME as string,
     4: DIMA_USERNAME as string,
   };
   private thirdSprintSchedule: SprintSchedule = {
-    1: STAS_USERNAME as string,
+    1: GRISHA_USERNAME as string,
     2: DANIIL_USERNAME as string,
     3: DIMA_USERNAME as string,
     4: IGOR_USERNAME as string,
@@ -44,7 +44,7 @@ class MaintenanceCheckNotificationCronJob {
     1: DANIIL_USERNAME as string,
     2: DIMA_USERNAME as string,
     3: IGOR_USERNAME as string,
-    4: STAS_USERNAME as string,
+    4: GRISHA_USERNAME as string,
   };
   constructor() {
     const job = new CronJob(
@@ -178,7 +178,7 @@ class MaintenanceCheckNotificationCronJob {
 
     const areasToCheck = check === 2 ? fullCheck : basicCheck;
 
-    return `🤖 Today's maintenance check is on @${username}. Areas to check: ${areasToCheck}`;
+    return `🤖 Today's maintenance check is on ${username}. Areas to check: ${areasToCheck}`;
   }
 }
 
