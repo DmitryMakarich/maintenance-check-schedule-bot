@@ -11,7 +11,7 @@ const {
   DIMA_USERNAME,
   IGOR_USERNAME,
   GRISHA_USERNAME,
-  DANIIL_USERNAME,
+  ANDREY_USERNAME,
   TEST_DATE,
 } = process.env;
 
@@ -26,22 +26,22 @@ class MaintenanceCheckNotificationCronJob {
     1: DIMA_USERNAME as string,
     2: IGOR_USERNAME as string,
     3: GRISHA_USERNAME as string,
-    4: DANIIL_USERNAME as string,
+    4: ANDREY_USERNAME as string,
   };
   private secondSprintSchedule: SprintSchedule = {
     1: IGOR_USERNAME as string,
     2: GRISHA_USERNAME as string,
-    3: DANIIL_USERNAME as string,
+    3: ANDREY_USERNAME as string,
     4: DIMA_USERNAME as string,
   };
   private thirdSprintSchedule: SprintSchedule = {
     1: GRISHA_USERNAME as string,
-    2: DANIIL_USERNAME as string,
+    2: ANDREY_USERNAME as string,
     3: DIMA_USERNAME as string,
     4: IGOR_USERNAME as string,
   };
   private fourthSprintSchedule: SprintSchedule = {
-    1: DANIIL_USERNAME as string,
+    1: ANDREY_USERNAME as string,
     2: DIMA_USERNAME as string,
     3: IGOR_USERNAME as string,
     4: GRISHA_USERNAME as string,
